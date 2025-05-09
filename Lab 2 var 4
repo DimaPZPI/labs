@@ -1,0 +1,108 @@
+using System;
+
+public class ElementCounter
+{
+    /// <summary>
+    /// Підраховує кількість входжень заданого елемента на заданій прямокутній ділянці двовимірного масиву.
+    /// </summary>
+    /// <typeparam name="T">Тип елементів у масиві.</typeparam>
+    /// <param name="array">Двовимірний масив для пошуку.</param>
+    /// <param name="targetElement">Елемент, кількість входжень якого потрібно підрахувати.</param>
+    /// <param name="startRow">Індекс початкового рядка прямокутної ділянки (включно).</param>
+    /// <param name="startCol">Індекс початкового стовпця прямокутної ділянки (включно).</param>
+    /// <param name="endRow">Індекс кінцевого рядка прямокутної ділянки (включно).</param>
+    /// <param name="endCol">Індекс кінцевого стовпця прямокутної ділянки (включно).</param>
+    /// <returns>Кількість входжень заданого елемента на заданій ділянці.</returns>
+    public static int CountElementsInRegion<T>(T[,] array, T targetElement, int startRow, int startCol, int endRow, int endCol) where T : IEquatable<T>
+    {
+        // Перевірка на null для масиву
+        if (array == null)
+        {
+            Console.WriteLine("Помилка: Масив є null.");
+            return 0;
+        }
+
+        int rows = array.GetLength(0);
+        int cols = array.GetLength(1);
+        int count = 0;
+
+        // Перевірка на валідність заданих меж ділянки
+        if (startRow < 0 || startRow >= rows ||
+            startCol < 0 || startCol >= cols ||
+            endRow < 0 || endRow >= rows ||
+            endCol < 0 || endCol >= cols ||
+            startRow > endRow ||
+            startCol > endCol)
+        {
+            Console.WriteLine("Помилка: Некоректні межі прямокутної ділянки.");
+            return 0;
+        }
+
+        // Ітеруємо по заданій прямокутній ділянці масиву
+        for (int i = startRow; i <= endRow; i++)
+        {
+            for (int j = startCol; j <= endCol; j++)
+            {
+                // Порівнюємо поточний елемент з цільовим елементом
+                // Використовуємо IEquatable<T> для безпечного порівняння значень
+                if (array[i, j] != null && array[i, j].Equals(targetElement))
+                {
+                    count++;
+                }
+                // Додано обробку для випадку, коли цільовий елемент є null
+                else if (array[i, j] == null && targetElement == null)
+                {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public static void Main(string[] args)
+    {
+        // Приклад використання:
+        int[,] integerMatrix = {
+            { 1, 2, 3, 4 },
+            { 5, 2, 7, 8 },
+            { 9, 2, 11, 12 },
+            { 13, 14, 2, 16 }
+        };
+
+        int targetInt = 2;
+        int countInt = CountElementsInRegion(integerMatrix, targetInt, 1, 1, 3, 2);
+        Console.WriteLine($"Кількість елемента {targetInt} на ділянці (рядки 1-3, стовпці 1-2): {countInt}"); // Очікуваний результат: 2
+
+        string[,] stringMatrix = {
+            { "apple", "banana", "cherry" },
+            { "date", "banana", "fig" },
+            { "grape", "kiwi", "banana" }
+        };
+
+        string targetString = "banana";
+        int countString = CountElementsInRegion(stringMatrix, targetString, 0, 0, 2, 2);
+        Console.WriteLine($"Кількість елемента \"{targetString}\" на ділянці (рядки 0-2, стовпці 0-2): {countString}"); // Очікуваний результат: 2
+
+        double[,] doubleMatrix = {
+            { 1.0, 2.5, 3.0 },
+            { 2.5, 4.0, 2.5 },
+            { 5.0, 2.5, 6.0 }
+        };
+
+        double targetDouble = 2.5;
+        int countDouble = CountElementsInRegion(doubleMatrix, targetDouble, 0, 1, 2, 1);
+        Console.WriteLine($"Кількість елемента {targetDouble} на ділянці (рядки 0-2, стовпці 1): {countDouble}"); // Очікуваний результат: 3
+
+        // Приклад з null елементом
+        string[,] nullableMatrix = {
+            { "a", null, "c" },
+            { null, "e", "f" },
+            { "g", "h", null }
+        };
+
+        string targetNullString = null;
+        int countNullString = CountElementsInRegion(nullableMatrix, targetNullString, 0, 0, 2, 2);
+        Console.WriteLine($"Кількість елемента null на ділянці (рядки 0-2, стовпці 0-2): {countNullString}"); // Очікуваний результат: 3
+    }
+}
